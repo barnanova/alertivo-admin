@@ -18,20 +18,22 @@ class ReceiveEmergency(APIView):
         if Emergency.objects.filter(emergency_id=report_id).exists():
             return Response({"message": "Already exists"}, status=status.HTTP_200_OK)
 
+        # Whitelist only allowed fields — this prevents any unexpected fields like 'additional_info'
+        allowed_data = {
+            'emergency_id': report_id,
+            'type': data.get('type', 'medical'),
+            'location': data.get('location', {}),
+            'details': data.get('details', {}),
+            'notes': data.get('notes', ''),
+            'urgency': data.get('urgency', 'medium'),
+            'contact_method': data.get('contactMethod', 'both'),
+            'created_by_uid': data.get('createdByUID', ''),
+            'display_code': data.get('displayCode', 'ANON'),
+            'status': 'pending',
+        }
+
         try:
-            Emergency.objects.create(
-                emergency_id=report_id,
-                type=data.get('type', 'medical'),
-                location=data.get('location', {}),
-                details=data.get('details', {}),  # Medical object
-                notes=data.get('notes', ''),      # Free text description
-                urgency=data.get('urgency', 'medium'),
-                contact_method=data.get('contactMethod', 'both'),
-                additional_info=data.get('additionalInfo', {}),
-                created_by_uid=data.get('createdByUID', ''),
-                display_code=data.get('displayCode', 'ANON'),
-                status='pending',
-            )
+            Emergency.objects.create(**allowed_data)
             return Response({"message": "Emergency received"}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
