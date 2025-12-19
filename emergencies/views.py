@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Emergency
 from django.http import JsonResponse
-from RtcTokenBuilder import RtcTokenBuilder
+from agora_token_builder import RtcTokenBuilder
 import time
 
 # Existing API for receiving emergencies from the app
