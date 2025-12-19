@@ -1,1 +1,4 @@
+Django>=4.2,<5.0
+gunicorn
+whitenoise
 agora_token_builder==1.0.0
