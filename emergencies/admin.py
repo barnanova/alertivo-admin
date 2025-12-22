@@ -46,25 +46,27 @@ class EmergencyAdmin(admin.ModelAdmin):
         return f"Affected: {d.get('who', 'N/A')} | Type: {d.get('medType', 'N/A')} | Number: {d.get('numAffected', 'N/A')} | Urgency: {d.get('urgency', 'N/A')}"
     medical_details.short_description = "Medical Summary"
 
-    # Staff "Join VoIP Call" button
+    # Staff "Join VoIP Call" button for 100ms
     def join_call_button(self, obj):
         if obj.contact_method in ['call', 'both']:
             return format_html(
-                '<button type="button" onclick="joinAgoraCall(\'{}\')" '
-                'style="background:#E63946;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;">'
+                '<button type="button" onclick="joinHMSCall(\'{}\')" '
+                'style="background:#E63946;color:white;padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;">'
                 '📞 Join VoIP Call</button>'
-                '<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.1.js"></script>'
+                '<script src="https://sdk.100ms.live/javascript/v2/hms.js"></script>'
                 '<script>'
-                'async function joinAgoraCall(channel) {{'
+                'async function joinHMSCall(roomId) {{'
                 '  try {{'
-                '    const res = await fetch(`/api/agora-token/${{channel}}/`);'
-                '    if (!res.ok) throw new Error("Token error");'
-                '    const data = await res.json();'
-                '    const client = AgoraRTC.createClient({{mode:"rtc", codec:"vp8"}});'
-                '    await client.join(data.appId, channel, data.token, null);'
-                '    const mic = AgoraRTC.createMicrophoneAudioTrack();'
-                '    await client.publish([mic]);'
-                '    alert("You have joined the call — speak to the student now");'
+                '    const response = await fetch(`/api/hms-token/${{roomId}}/`);'
+                '    if (!response.ok) throw new Error("Failed to fetch token");'
+                '    const {{ token }} = await response.json();'
+                '    const hms = new HMS.SDK();'
+                '    await hms.join({{'
+                '      userName: "Staff",'
+                '      authToken: token,'
+                '      settings: {{ audioOnly: true }}'
+                '    }});'
+                '    alert("Joined call — speak to the student now");'
                 '  }} catch (err) {{'
                 '    alert("Failed to join call: " + err.message);'
                 '  }}'
