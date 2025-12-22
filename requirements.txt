@@ -1,1 +1,6 @@
+Django>=4.2,<5.0
+djangorestframework
+gunicorn
+whitenoise
+psycopg2-binary
 PyJWT==2.10.1
