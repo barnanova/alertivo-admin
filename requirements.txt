@@ -1,5 +1,0 @@
-Django>=4.2,<5.0
-djangorestframework
-gunicorn
-whitenoise
-agora_token_builder==1.0.0
